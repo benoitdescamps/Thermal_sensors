@@ -3,6 +3,9 @@ from heat_env import env
 import numpy as np
 from matplotlib import pyplot as plt
 
+class Replay_Memory_D(object):
+    pass
+
 
 def define_Q():
     input = tf.placeholder(shape=(None, 32, 32, 1), dtype=tf.float32)
