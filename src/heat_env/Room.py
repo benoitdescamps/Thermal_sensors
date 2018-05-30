@@ -8,13 +8,14 @@ class HeatSource(object):
         self.x1 =x1
         self.y0 = y0
         self.y1 =y1
-
     def act_on_source(self,Tnew):
         self.T = Tnew
 
     def apply_source(self,image):
         image[self.x0:self.x1,self.y0:self.y1] = self.T
         return image
+    def get_heat_loss(self,img):
+        return np.sum(np.abs(img[self.x0:self.x1,self.y0:self.y1]-self.T))
 class Room(object):
 
     def __init__(self,image):
@@ -25,14 +26,21 @@ class Room(object):
         self.heat_sources.append(heatsrc)
 
     def _apply_heat_sources(self):
+        heat_loss = 0.0
         for heatsrc in self.heat_sources:
+            heat_loss+= heatsrc.get_heat_loss(self.image)
             heatsrc.apply_source(self.image)
+        return heat_loss
 
     def propagate(self,dt,dx,dy,n_steps):
         'appl'
-        self.image[1:-1:,1:-1:] = self.image[1:-1:, 1:-1:] + dt*(np.diff(self.image, n=2, axis=0)[:,1:-1:]/(dx*dx) \
+        heat_loss = 0.0
+        for n in range(n_steps):
+            self.image[1:-1:,1:-1:] = self.image[1:-1:, 1:-1:] + dt*(np.diff(self.image, n=2, axis=0)[:,1:-1:]/(dx*dx) \
                                                + np.diff(self.image, n=2, axis=1)[1:-1:,:]/(dy*dy))
 
+            heat_loss += self._apply_heat_sources()*dx*dy
+        return heat_loss
 
-        return self._apply_heat_sources()
+
 

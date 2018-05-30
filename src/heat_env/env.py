@@ -13,9 +13,11 @@ class HeatEnv(object):
     """
     metadata = {}
 
-    def __init__(self):
+    def __init__(self,T_ideal=23):
+        self.T_ideal = T_ideal
+
         self.room = Room(image=20*np.ones(shape=(32,32)))
-        hsrc0 = HeatSource(T=23,x0=4,x1=20,y0=4,y1=7,name='radiator')
+        hsrc0 = HeatSource(T=35,x0=4,x1=20,y0=2,y1=3,name='radiator')
         hsrc1 = HeatSource(T=10, x0=4, x1=28, y0=0, y1=1, name='window')
         self.room.add_heat_source(hsrc0)
         self.room.add_heat_source(hsrc1)
@@ -24,7 +26,10 @@ class HeatEnv(object):
     def step(self, a):
         reward = 0.0
         #action = self._action_set[a]
-
+        if a ==1:
+            self.room.heat_sources[0].T += 5.
+        elif a==2:
+            self.room.heat_sources[0].T += -5.
         # if isinstance(self.frameskip, int):
         #     num_steps = self.frameskip
         # else:
@@ -38,11 +43,13 @@ class HeatEnv(object):
         #reward += -self._get_cost(ob)
         #done = False
         #return ob, reward, done, {}
-        self.room.propagate(dt=1.,dx=0.1,dy=0.1,n_steps=100)
-        return None,None,True,{}
+        heat_loss = self.room.propagate(dt=0.2,dx=1.,dy=1.,n_steps=1000)
+
+        reward = -0.001*heat_loss - np.mean((self.room.image-self.T_ideal)**2)
+        return self.room.image,reward,True,{}
 
     def reset(self):
-        pass
+        self.room.heat_sources[0].T = np.random.randint(8, 15)
 
     def render(self, mode='human', close=False):
         pass
@@ -51,36 +58,8 @@ class HeatEnv(object):
         thermal_image = ...
         return thermal_image
 
-    def _propagate(self, img, dt, dx, dy, n_steps):
-        """
-        Apply the heat equations
 
-        Args:
-            img: numpy array:
-            thermal image
-            dt: float:
-            time delta-ste[
-            dx: float:
-            x-space delta-step
-            dy: float:
-            y-space delta-step
+    def _get_cost(self):
 
-
-        """
-        new_img = img.copy()
-        new_img[:-2:, :-2:] = img[:-2:, :-2:] + (np.diff(img, n=2, axis=0) + np.diff(img, n=2, axis=1)) * dt / (dx * dy)
-
-        return self._apply_boundary_conditions(
-            new_img
-        )
-
-    def _apply_boundary_conditions(self, img):
-        """
-        Apply boundary conditions
-        :param img:
-        :return:
-        """
-        return NotImplementedError
-
-    def _get_cost(self,img):
+        self.mean((self.room.image-self.T_ideal)**2)
         return NotImplementedError
