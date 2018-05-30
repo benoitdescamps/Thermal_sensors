@@ -31,10 +31,10 @@ if __name__ == '__main__':
 
 
     #create environment
-    environment = env.HeatEnv()
+    environment = env.HeatEnv(T_ideal=23)
     epsilon = 0.2
     gamma = 0.1
-    N_ROUNDS = 10000
+    N_ROUNDS = 5000
     N_TRAININ_ROUNDS = 100
 
     target = tf.placeholder(shape=(None,), dtype=tf.float32)
@@ -44,6 +44,9 @@ if __name__ == '__main__':
     optimizer = tf.train.AdamOptimizer(1e-3).minimize(cost)
 
     init_op = tf.global_variables_initializer()
+
+    # Add ops to save and restore all the variables.
+    saver = tf.train.Saver()
     with tf.Session() as sess:
         sess.run(init_op)
         for round in range(N_ROUNDS):
@@ -61,9 +64,9 @@ if __name__ == '__main__':
 
             new_state,reward,_,_ = environment.step(action)
 
-            if (round % 500)==0:
-                print('Temparture old state:{:.2f} \n Temperature new state:{:.2f} \n Action Taken:{}'.format(
-                    np.mean(old_state), np.mean(new_state), ACTIONS[action]))
+            if (round % 20)==0:
+                print('Remaining rounds: {} \n Temparture old state:{:.2f} \n Temperature new state:{:.2f} \n Action Taken:{} \n Temperature Heater: {}'.format(\
+                    N_ROUNDS-round,np.mean(old_state), np.mean(new_state), ACTIONS[action],environment.room.heat_sources[0].T))
 
             replay_memory_D.append({'state':old_state,\
                     'action':action,'reward':reward,'new_state':new_state})
@@ -89,5 +92,9 @@ if __name__ == '__main__':
 
             for n in range(N_TRAININ_ROUNDS):
                 sess.run(optimizer,feed_dict={Q_in:ss,action_indices:aa,target:tt})
+            # Save the variables to disk.
+
+            if (round % 500) == 0:
+                save_path = saver.save(sess, "model/{}/thermal_model.ckpt".format(round))
 
 

@@ -15,7 +15,7 @@ class HeatSource(object):
         image[self.x0:self.x1,self.y0:self.y1] = self.T
         return image
     def get_heat_loss(self,img):
-        return np.sum(np.abs(img[self.x0:self.x1,self.y0:self.y1]-self.T))
+        return np.mean(np.abs(img[self.x0:self.x1,self.y0:self.y1]-self.T))
 class Room(object):
 
     def __init__(self,image):

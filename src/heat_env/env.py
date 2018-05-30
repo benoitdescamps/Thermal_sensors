@@ -28,8 +28,12 @@ class HeatEnv(object):
         #action = self._action_set[a]
         if a ==1:
             self.room.heat_sources[0].T += 5.
+            if self.room.heat_sources[0].T>35:
+                self.room.heat_sources[0].T = 35
         elif a==2:
             self.room.heat_sources[0].T += -5.
+            if self.room.heat_sources[0].T<10:
+                self.room.heat_sources[0].T = 10
         # if isinstance(self.frameskip, int):
         #     num_steps = self.frameskip
         # else:
@@ -45,11 +49,11 @@ class HeatEnv(object):
         #return ob, reward, done, {}
         heat_loss = self.room.propagate(dt=0.2,dx=1.,dy=1.,n_steps=1000)
 
-        reward = -0.001*heat_loss - np.mean((self.room.image-self.T_ideal)**2)
+        reward = -0.5*heat_loss - np.mean(np.abs(self.room.image-self.T_ideal))-0.2*np.abs(self.T_ideal-self.room.heat_sources[0].T)
         return self.room.image,reward,True,{}
 
     def reset(self):
-        self.room.heat_sources[0].T = np.random.randint(8, 15)
+        self.room.heat_sources[1].T = np.random.randint(10, 15)
 
     def render(self, mode='human', close=False):
         pass
