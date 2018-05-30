@@ -6,11 +6,12 @@
 **/*.pyc
 **/*pickle
 **/*.pdf
+**/**/*.pdf
 **/*.csv
 
 
-*/**/data/*
-*/**/doc/*
+**/data/*
+**/doc/*
 */**/notebooks/*
 */**/__pycache__/*
 */**/__cache__/*

@@ -1,23 +1,10 @@
-class HeatSource(object):
-    def __init__(self,ix,iy,dx,dy,T):
-        self.ix = ix
-        self.iy = iy
-        self.dx = dx
-        self.dy = dy
-        self.T = T
-
-    def act_on_source(self,Tnew):
-        self.T = Tnew
-
-    def apply_source(self,img):
-        img[self.ix:self.ix+self.dx:,self.iy:self.iy+self.dy:] = self.T
-        return img
 
 # class Action(object):
 #     def __init__(self,heat_source):
 #         self.source = heat_source
 
-
+import numpy as np
+from  .Room import Room, HeatSource
 class HeatEnv(object):
     """
     Args:
@@ -27,12 +14,16 @@ class HeatEnv(object):
     metadata = {}
 
     def __init__(self):
-        self.boundary = []
+        self.room = Room(image=20*np.ones(shape=(32,32)))
+        hsrc0 = HeatSource(T=23,x0=4,x1=20,y0=4,y1=7,name='radiator')
+        hsrc1 = HeatSource(T=10, x0=4, x1=28, y0=0, y1=1, name='window')
+        self.room.add_heat_source(hsrc0)
+        self.room.add_heat_source(hsrc1)
 
 
     def step(self, a):
         reward = 0.0
-        action = self._action_set[a]
+        #action = self._action_set[a]
 
         # if isinstance(self.frameskip, int):
         #     num_steps = self.frameskip
@@ -40,12 +31,15 @@ class HeatEnv(object):
         #     num_steps = self.np_random.randint(self.frameskip[0], self.frameskip[1])
         # for _ in range(num_steps):
         #     reward += self.ale.act(action)
-        ob = self._get_obs()
-        reward = 0.0
 
-        reward += -self._get_cost(ob)
-        done = False
-        return ob, reward, done, {}
+        #ob = self._get_obs()
+        #reward = 0.0
+
+        #reward += -self._get_cost(ob)
+        #done = False
+        #return ob, reward, done, {}
+        self.room.propagate(dt=1.,dx=0.1,dy=0.1,n_steps=100)
+        return None,None,True,{}
 
     def reset(self):
         pass
