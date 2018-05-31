@@ -1,3 +1,0 @@
-model_checkpoint_path: "thermal_model.ckpt"
-all_model_checkpoint_paths: "..\\0\\thermal_model.ckpt"
-all_model_checkpoint_paths: "thermal_model.ckpt"

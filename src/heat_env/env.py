@@ -16,9 +16,9 @@ class HeatEnv(object):
     def __init__(self,T_ideal=23):
         self.T_ideal = T_ideal
 
-        self.room = Room(image=20*np.ones(shape=(32,32)))
-        hsrc0 = HeatSource(T=35,x0=4,x1=20,y0=2,y1=3,name='radiator')
-        hsrc1 = HeatSource(T=10, x0=4, x1=28, y0=0, y1=1, name='window')
+        self.room = Room(image=15*np.random.rand(32,32))
+        hsrc0 = HeatSource(T=20,x0=4,x1=28,y0=2,y1=4,name='radiator')
+        hsrc1 = HeatSource(T=10, x0=8, x1=14, y0=0, y1=1, name='window')
         self.room.add_heat_source(hsrc0)
         self.room.add_heat_source(hsrc1)
 
@@ -26,35 +26,32 @@ class HeatEnv(object):
     def step(self, a):
         reward = 0.0
         #action = self._action_set[a]
+
         if a ==1:
             self.room.heat_sources[0].T += 5.
-            if self.room.heat_sources[0].T>35:
-                self.room.heat_sources[0].T = 35
+            if self.room.heat_sources[0].T>200:
+                self.room.heat_sources[0].T = 200
         elif a==2:
             self.room.heat_sources[0].T += -5.
             if self.room.heat_sources[0].T<10:
                 self.room.heat_sources[0].T = 10
-        # if isinstance(self.frameskip, int):
-        #     num_steps = self.frameskip
-        # else:
-        #     num_steps = self.np_random.randint(self.frameskip[0], self.frameskip[1])
-        # for _ in range(num_steps):
-        #     reward += self.ale.act(action)
 
-        #ob = self._get_obs()
-        #reward = 0.0
+        #t_variation = np.sum( np.abs(self.room.image-self.T_ideal) )
+        #space_size = self.room.image.size
+        #for heatsrc in self.room.heat_sources:
+        #    t_variation+= - np.sum(np.abs(heatsrc.get_heat_img(self.room.image)-self.T_ideal))
+        #    space_size+= - heatsrc.get_heat_img(self.room.image).size
 
-        #reward += -self._get_cost(ob)
-        #done = False
-        #return ob, reward, done, {}
         heat_loss = self.room.propagate(dt=0.2,dx=1.,dy=1.,n_steps=1000)
-
-        reward = -0.5*heat_loss - np.mean(np.abs(self.room.image-self.T_ideal))-0.2*np.abs(self.T_ideal-self.room.heat_sources[0].T)
+        #*np.abs(self.T_ideal-self.room.heat_sources[0].T)
+        assert(len(self.room.image.shape)==2)
+        reward = np.mean(np.abs(self.room.image[10::,10::]-self.T_ideal))#(- t_variation/space_size)
         return self.room.image,reward,True,{}
 
     def reset(self):
-        self.room.heat_sources[1].T = np.random.randint(10, 15)
-
+        self.room.heat_sources[1].T = np.random.randint(0, 10)
+        self.room.heat_sources[0].T = np.random.randint(15, 20)
+        self.room.image = self.room.heat_sources[0].T * np.random.rand(32, 32)
     def render(self, mode='human', close=False):
         pass
 
