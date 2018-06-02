@@ -40,9 +40,16 @@ class Room(object):
         for n in range(n_steps):
             self.image[1:-1:,1:-1:] = self.image[1:-1:, 1:-1:] + dt*(np.diff(self.image, n=2, axis=0)[:,1:-1:]/(dx*dx) \
                                                + np.diff(self.image, n=2, axis=1)[1:-1:,:]/(dy*dy))
+            self.image[0, :] = self.image[1, :]
+            self.image[:, 0] = self.image[:, 1]
+            self.image[-1, :] = self.image[-2, :]
+            self.image[:, -1] = self.image[:, -2]
 
             heat_loss += self._apply_heat_sources()*dx*dy
         return heat_loss
+
+    def get_room_temperature(self):
+        return np.median(self.image)
 
 
 

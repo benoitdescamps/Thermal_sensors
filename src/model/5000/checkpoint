@@ -1,0 +1,6 @@
+model_checkpoint_path: "thermal_model.ckpt"
+all_model_checkpoint_paths: "..\\3000\\thermal_model.ckpt"
+all_model_checkpoint_paths: "..\\3500\\thermal_model.ckpt"
+all_model_checkpoint_paths: "..\\4000\\thermal_model.ckpt"
+all_model_checkpoint_paths: "..\\4500\\thermal_model.ckpt"
+all_model_checkpoint_paths: "thermal_model.ckpt"
