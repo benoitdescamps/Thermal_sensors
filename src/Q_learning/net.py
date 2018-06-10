@@ -1,6 +1,13 @@
 import tensorflow as tf
 
 def define_Q(input_shape=(16,16)):
+    """
+    Defines the Q-matrix and returns the input and output tensorflow tensors.
+
+    Args:
+        :param Tuple input_shape:
+        :return: Tuple[tf.tensor, tf.tensor]
+    """
     input = tf.placeholder(shape=(None,)+input_shape+(1,), dtype=tf.float32)
     nn_1 = tf.layers.batch_normalization(input)
     filter_1 = tf.Variable(tf.random_normal([3, 3, 1, 4], stddev=1.0))
@@ -17,6 +24,13 @@ def define_Q(input_shape=(16,16)):
     return input,output
 
 def get_cost(target,Q,action_indices):
+    """
+    Cost-function of the Q-matrix attempting to approximate the reward-function
+    :param tf.placeholder target: placeholder for the values of the registered rewards
+    :param tf.placeholder Q: output of the Q-matrix the registered state
+    :param tf.placeholder action_indices: placeholder for the indices of the registered actions
+    :return: tf.tensor mean_squared error the reward vs Q-matrix
+    """
     row_indices =  tf.range(tf.shape(action_indices)[0])
     full_indices = tf.stack([row_indices, action_indices], axis=1)
     q_values = tf.gather_nd(Q, full_indices)

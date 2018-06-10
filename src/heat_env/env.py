@@ -1,17 +1,15 @@
-
-# class Action(object):
-#     def __init__(self,heat_source):
-#         self.source = heat_source
-
 import numpy as np
 from  .Room import Room, HeatSource
 from matplotlib import pyplot as plt
 from .server import Client
 class HeatEnv(object):
     """
+    Class for the Reinforcement Learning Environment
     Args:
-        boundary: list of HeatSources
-        source of changement of temperature
+        Tuple room_shape: dimension of the room
+        Int T_ideal: Temperature which we would like to achieve
+        Int TIME_STEPS: [Development] number of time steps which we should apply
+        at each iteration of the environment
     """
     metadata = {}
 
@@ -34,6 +32,11 @@ class HeatEnv(object):
 
 
     def step(self, a):
+        """
+        Single iteration of the environment given an action a
+        :param Int a: action
+        :return:
+        """
         if a ==1:
             self.room.heat_sources[0].T += 1.
             if self.room.heat_sources[0].T>50:
@@ -56,6 +59,10 @@ class HeatEnv(object):
         return self.room.image,reward,True,{}
 
     def reset(self):
+        """
+        Resets the environment
+        :return:
+        """
         self.room.heat_sources[1].T = np.random.randint(0, 10)
         self.room.heat_sources[0].T = np.random.choice([np.random.randint(15, 20),np.random.randint(35, 50)])
         self.room.image = self.room.heat_sources[0].T * np.random.rand(16, 16)
@@ -63,6 +70,15 @@ class HeatEnv(object):
         self.info = {'heatloss': list(),'T_room':list()}
         self.latest_info = {'heatloss': None, 'T_room': None}
     def render(self, mode='human', close=False):
+        """
+        renders the environment.
+        :param mode:
+        :param close:
+        :return:
+        """
+        #TODO: fix server
+        #TODO: connect data stream with Bokeh
+
         #f, (ax2, ax3) = plt.subplots(2, sharex=True, sharey=False)
         #heatmap = ax1.imshow(self.room.image, cmap='hot', interpolation='nearest')
         #plt.colorbar(heatmap,ax=[ax1])
@@ -74,14 +90,10 @@ class HeatEnv(object):
         #plt.pause(0.0001)
         #plt.clf()
         # fig.canvas.flush_ev
+
         self.client.send_data(self.latest_info)
 
     def _get_obs(self):
+        #TODO: later once I connect the sensors
         thermal_image = ...
         return thermal_image
-
-
-    def _get_cost(self):
-
-        self.mean((self.room.image-self.T_ideal)**2)
-        return NotImplementedError

@@ -115,7 +115,7 @@ class Room(object):
         """
         Estimates the global temperature of the room from the thermal image
 
-        :return:
+        :return: float global room temperature
         """
         #TODO: eventually change this to @property
         return np.median(self.image)

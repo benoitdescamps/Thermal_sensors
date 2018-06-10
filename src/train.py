@@ -16,8 +16,6 @@ def basic_Q(T,T_ideal,eps):
                     np.sign(T-T_ideal)*np.int(np.abs(T-T_ideal)>=eps)])
 
 if __name__ == '__main__':
-
-
     ROOM_SHAPE = (16,16)
 
     Q_in,Q_out = define_Q(input_shape=ROOM_SHAPE)
