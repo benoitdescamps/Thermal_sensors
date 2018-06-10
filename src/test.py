@@ -1,5 +1,5 @@
 from heat_env import env
-from Q_learning import define_Q
+from Q_learning.net import define_Q
 from matplotlib import pyplot as plt
 import time
 import numpy as np
@@ -17,17 +17,17 @@ if __name__ == "__main__":
 
     NROUNDS = 100
     with tf.Session() as sess:
-        saver.restore(sess, "model/4500/thermal_model.ckpt")
+        saver.restore(sess, "model/5000/thermal_model.ckpt")
         for i in range(NROUNDS):
             if (i%5)==0:
                 print('Resetting Environment...')
                 environment.reset()
-            state = environment.room.image.reshape(1, 32, 32, 1).copy()
+            state = environment.room.image.reshape(1, 16, 16, 1).copy()
             Q_current = sess.run(Q_out, feed_dict={Q_in: state})
 
             print(Q_current)
 
-            action = np.argmax(Q_current.ravel())
+            action = 1+np.argmax(Q_current.ravel()[1::])
 
             T_old = np.mean(state)
             state, reward, _, _ = environment.step(action)
@@ -37,6 +37,5 @@ if __name__ == "__main__":
                     NROUNDS - i, T_old, T_new, ACTIONS[action],
                     environment.room.heat_sources[0].T))
 
-            plt.imshow(environment.room.image, cmap='hot', interpolation='nearest')
-            plt.show()
-            time.sleep(2)
+            environment.render()
+            time.sleep(3)

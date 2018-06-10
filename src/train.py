@@ -16,7 +16,7 @@ def basic_Q(T,T_ideal,eps):
                     np.sign(T-T_ideal)*np.int(np.abs(T-T_ideal)>=eps)])
 
 if __name__ == '__main__':
-    plt.ion()
+
 
     ROOM_SHAPE = (16,16)
 
@@ -26,7 +26,7 @@ if __name__ == '__main__':
     #create environment
     T_ideal = 23
     environment = env.HeatEnv(room_shape=ROOM_SHAPE,T_ideal=T_ideal)
-    q_p = 0.8
+    q_p = 0.3
     q_eps = 1.
     epsilon = 0.2
     gamma = 0.1
@@ -80,6 +80,7 @@ if __name__ == '__main__':
             # Save the variables to disk.
 
             if (round % 500) == 0:
+
                 save_path = saver.save(sess, "model/{}/thermal_model.ckpt".format(round))
 
 

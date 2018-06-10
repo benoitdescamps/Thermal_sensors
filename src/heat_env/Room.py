@@ -1,21 +1,24 @@
 import numpy as np
 
 class HeatSource(object):
-    def __init__(self,T,x0,x1,y0,y1,name):
+    def __init__(self,T,x0,x1,y0,y1,name,controllable=False):
         self.name = name
         self.T = T
+        #self.Told = T
         self.x0 = x0
         self.x1 =x1
         self.y0 = y0
         self.y1 =y1
+        self.is_oontrollable = controllable
     def act_on_source(self,Tnew):
         self.T = Tnew
 
     def apply_source(self,image):
         image[self.x0:self.x1,self.y0:self.y1] = self.T
+        self.Told = self.T
         return image
     def get_heat_loss(self,img):
-        return np.mean(np.abs(img[self.x0:self.x1,self.y0:self.y1]-self.T))
+        return np.mean(img[self.x0:self.x1,self.y0:self.y1]-self.T)
     def get_heat_img(self,img):
         return img[self.x0:self.x1,self.y0:self.y1]
 class Room(object):
@@ -30,7 +33,8 @@ class Room(object):
     def _apply_heat_sources(self):
         heat_loss = 0.0
         for heatsrc in self.heat_sources:
-            heat_loss+= heatsrc.get_heat_loss(self.image)
+            if heatsrc.is_oontrollable:
+                heat_loss+= heatsrc.get_heat_loss(self.image)
             heatsrc.apply_source(self.image)
         return heat_loss
 
@@ -45,7 +49,7 @@ class Room(object):
             self.image[-1, :] = self.image[-2, :]
             self.image[:, -1] = self.image[:, -2]
 
-            heat_loss += self._apply_heat_sources()*dx*dy
+            heat_loss += self._apply_heat_sources()*dx*dy*dt
         return heat_loss
 
     def get_room_temperature(self):
