@@ -4,7 +4,7 @@ class Client(object):
 
     def __init__(self):
         self.HOST = 'localhost'
-        self.PORT = 5555
+        self.PORT = 5556
         self.ADDR = (self.HOST, self.PORT)
         self.BUFSIZE = 4096
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -19,7 +19,7 @@ class Server(object):
 
     def __init__(self):
         self.HOST = 'localhost'
-        self.PORT = 5555
+        self.PORT = 5556
         self.ADDR = (self.HOST, self.PORT)
         self.BUFSIZE = 4096
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
